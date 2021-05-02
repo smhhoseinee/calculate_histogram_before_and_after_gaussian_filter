@@ -23,7 +23,7 @@ int main(){
 	//Get the photo address from process C
 	read_bytes = read(fd_1 , photo_address , sizeof(photo_address));
 	photo_address[read_bytes] = '\0';
-	printf("photo address is resived from process C in process A is: %s\n" , photo_address );
+	printf("photo address is resived from process C in process B is: %s\n" , photo_address );
 
 	return 0;
 }

@@ -9,6 +9,7 @@
 #define FIFO_FILE1 "/tmp/fifo1"
 #define FIFO_FILE2 "/tmp/fifo2"
 
+void calculate_histogram(char *photo_address ,int *histogram );
 int main(){
 	
 	//Variables
@@ -24,10 +25,41 @@ int main(){
 	//Get the photo address before applying Gaussian filter
 	read_bytes = read(fd_1 , photo_address , sizeof(photo_address));
 	photo_address[read_bytes] = '\0';
-	printf("photo address is resived from process C in process B is: %s\n" , photo_address );
+//	printf("photo address is resived from process C in process A is: %s\n" , photo_address );
+	
+	
+	
+	//Calculate the histogram for input photo before applying Gaussian filter
+	calculate_histogram(photo_address ,histogram );
+	
+	//Send photo histogram to C process
+	write(fd_2 , histogram , 256*sizeof(int));
 
 	return 0;
 }
+
+void calculate_histogram(char *photo_address ,int *histogram ){
+	unsigned char header[54];
+    unsigned char pixel;
+
+    FILE *fIn = fopen(photo_address, "rb");
+    fread(header, sizeof(unsigned char), 54, fIn);
+
+    int width = *(int*)&header[18];
+    int height = abs(*(int*)&header[22]);
+
+    for (int y = 0; y < height; ++y)
+    {
+        for (int x = 0; x < width; ++x)
+        {
+            fread(&pixel, 1, 1, fIn);
+            histogram[pixel]++;
+        }
+    }
+    fclose(fIn);
+}
+
+
 
 
 
