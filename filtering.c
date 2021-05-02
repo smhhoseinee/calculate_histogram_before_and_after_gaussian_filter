@@ -4,9 +4,13 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
+#include <stdlib.h>
+
 
 #define FIFO_FILE3 "/tmp/fifo3"
 #define FIFO_FILE4 "/tmp/fifo4"
+
+const float PI = 3.14;
 
 void gaussian_filter(char *photo_address , char *new_photo_address);
 
@@ -46,4 +50,26 @@ void gaussian_filter(char *photo_address , char *new_photo_address){
 	//body of function gaussian_filter
 	
 }
+
+void calculate_histogram(char *photo_address ,int *histogram ){
+	unsigned char header[54];
+	unsigned char pixel;
+
+	FILE *fIn = fopen(photo_address, "rb");
+	fread(header, sizeof(unsigned char), 54, fIn);
+
+	int width = *(int*)&header[18];
+	int height = abs(*(int*)&header[22]);
+
+	for (int y = 0; y < height; ++y)
+	{
+		for (int x = 0; x < width; ++x)
+		{
+			fread(&pixel, 1, 1, fIn);
+			histogram[pixel]++;
+		}
+	}
+	fclose(fIn);
+}
+
 
