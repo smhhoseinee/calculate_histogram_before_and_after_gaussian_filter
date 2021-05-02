@@ -14,7 +14,8 @@ int main(){
 	
 	//Variables
 	char photo_address[100];
-	int histogram[256] = {0} ;
+	int histogram1[256] = {0} ;
+	int histogram2[256] = {0} ;
 	int fd_1 ,fd_2;
 	int read_bytes;
 	
@@ -22,18 +23,30 @@ int main(){
 	fd_1 = open(FIFO_FILE1 , O_RDONLY);
 	fd_2 = open(FIFO_FILE2 , O_WRONLY);
 	
-	//Get the photo address before applying Gaussian filter
+	//Get the photo address before applying Gaussian filter from process C
 	read_bytes = read(fd_1 , photo_address , sizeof(photo_address));
 	photo_address[read_bytes] = '\0';
-//	printf("photo address is resived from process C in process A is: %s\n" , photo_address );
+	printf("photo address is resived from process C in process A is: %s\n" , photo_address );
 	
 	
 	
 	//Calculate the histogram for input photo before applying Gaussian filter
-	calculate_histogram(photo_address ,histogram );
+	calculate_histogram(photo_address ,histogram1 );
 	
 	//Send photo histogram to C process
-	write(fd_2 , histogram , 256*sizeof(int));
+	write(fd_2 , histogram1 , 256*sizeof(int));
+
+	//Get the new photo address after applying Gaussian filter	from process C
+	read_bytes = read(fd_1 , photo_address , sizeof(photo_address));
+	photo_address[read_bytes] = '\0';
+	
+
+	//Calculate the histogram for input photo after applying Gaussian filter
+	calculate_histogram(photo_address ,histogram2 );
+
+
+	//Send photo histogram to C process
+	write(fd_2 , histogram2 , 256*sizeof(int));
 
 	return 0;
 }

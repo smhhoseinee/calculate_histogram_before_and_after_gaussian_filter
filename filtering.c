@@ -8,6 +8,8 @@
 #define FIFO_FILE3 "/tmp/fifo3"
 #define FIFO_FILE4 "/tmp/fifo4"
 
+void gaussian_filter(char *photo_address , char *new_photo_address);
+
 int main(){
 	
 	//Variables	
@@ -16,7 +18,7 @@ int main(){
 	int fd_1 , fd_2;
 	int read_bytes;
 	
-	//Open a named pipe betweem process C and B	
+	//Open a named pipe betweem process B and C
 	fd_1 = open(FIFO_FILE3 , O_RDONLY);
 	fd_2 = open(FIFO_FILE4 , O_WRONLY);
 	
@@ -25,7 +27,23 @@ int main(){
 	photo_address[read_bytes] = '\0';
 	printf("photo address is resived from process C in process B is: %s\n" , photo_address );
 
+	//Apply Gaussian filter on input photo
+	gaussian_filter(photo_address , new_photo_address);
+	
+	//Send new photo address after applying Gaussian filter to process C.
+//	write(fd_2 , new_photo_address , sizeof(new_photo_address));
+	write(fd_2 , photo_address , sizeof(photo_address));
+	
+	//End process B and close named pipe
+	close(fd_1);
+	close(fd_2);
+
 	return 0;
 }
 
+void gaussian_filter(char *photo_address , char *new_photo_address){
+	
+	//body of function gaussian_filter
+	
+}
 

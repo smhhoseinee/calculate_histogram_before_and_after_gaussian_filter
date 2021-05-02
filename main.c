@@ -72,11 +72,26 @@ int main(){
 
 		//Get the entrance photo histogram before applying the Gaussian filter from the process A and 
 		//send it to the main process
-		sleep(1);
+		//sleep(1);
 		read(fd_2 , histogram1 , 256*sizeof(int));
 		
 		close(fd2[0]);
 		write(fd2[1] , histogram1 , 256*sizeof(int));
+		
+		//Receive a new photo address after applying Gaussian filter by process B
+		read(fd_4 , new_address , sizeof(new_address));
+		
+		// Send new photo after aplying Gaussian filter to process A 
+		write(fd_1 , new_address , strlen(new_address));
+
+		//Get the new photo histogram after applying the Gaussian filter from the process A and 
+		//send it to the main process
+		//sleep(1);
+		read(fd_2 , histogram1 , 256*sizeof(int));
+		
+		write(fd2[1] , histogram1 , 256*sizeof(int));
+		
+		
 		
 		exit(0);
 		
@@ -99,6 +114,16 @@ int main(){
 	close(fd2[1]);
 	read(fd2[0] , histogram_1 , 256*sizeof(int));
 	printf("The histogram of the input photo is :\n");
+	for(int i = 0 ; i < 256 ; i++){
+		printf("%-5d ", histogram_1[i]);
+		if(i%15 == 0){
+			printf("\n");
+		}
+	}
+
+	//Get the new photo histogram after applying the Gaussian filter from the process C
+	read(fd2[0] , histogram_1 , 256*sizeof(int));
+	printf("The histogram of the new photo is :\n");
 	for(int i = 0 ; i < 256 ; i++){
 		printf("%-5d ", histogram_1[i]);
 		if(i%15 == 0){
