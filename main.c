@@ -1,7 +1,16 @@
 #include<stdio.h>
 #include<stdlib.h>
-#include <string.h>
 #include<unistd.h>
+#include<sys/types.h>
+#include<sys/wait.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <string.h>
+
+#define FIFO_FILE1 "/tmp/fifo1"
+#define FIFO_FILE2 "/tmp/fifo2"
+#define FIFO_FILE3 "/tmp/fifo3"
+#define FIFO_FILE4 "/tmp/fifo4"
 
 int main(){
 
@@ -31,17 +40,34 @@ int main(){
 	else if(fork() == 0){
 
 		char address [100] ;
+		int fd_1 , fd_2 ,fd_3 ,fd_4 ,read_byte ;
+		
 
 		//cominucate with main process to obtain photo address
 		close(fd1[1]);
 		read(fd1[0] , address , sizeof(address));
-		printf("Address is resived from main is: %s\n" , address);
+		printf("photo address is resived from process main in process C is: %s\n" , address );
+
+		//Create two named pipes in order to cominucate with process A and B
+		mknod(FIFO_FILE1, S_IFIFO | 0640, 0);
+		mknod(FIFO_FILE2, S_IFIFO | 0640, 0);
+		mknod(FIFO_FILE3, S_IFIFO | 0640, 0);
+		mknod(FIFO_FILE4, S_IFIFO | 0640, 0);
+		
+		//Open a named pipe betweem process C and (A,B)	
+		fd_1 = open(FIFO_FILE1 , O_WRONLY);
+		fd_2 = open(FIFO_FILE2 , O_RDONLY);
+		fd_3 = open(FIFO_FILE3 , O_WRONLY);
+		fd_4 = open(FIFO_FILE4 , O_RDONLY);
+		
+		// Send photo address to process A and B
+		write(fd_1 , address , strlen(address));
+		write(fd_3 , address , strlen(address));
 		
 		exit(0);
 		
 	}
 	
-	sleep(1);
 	//Get photo address from the user
 	printf("Please enter the photo address: ");
 	fgets(photo_address , sizeof(photo_address) , stdin);
@@ -51,7 +77,7 @@ int main(){
 	//Send photo address to process C
 	close(fd1[0]);
 	write(fd1[1] , photo_address ,sizeof(photo_address));
-	
-	printf("Address is: %s\n" , photo_address);
+	sleep(1);
+	printf("photo address is resived from User in process main is: %s\n" , photo_address );
 	
 }
