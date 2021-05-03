@@ -6,21 +6,33 @@
 #include <string.h>
 #include <stdlib.h>
 
-
 #define FIFO_FILE3 "/tmp/fifo3"
 #define FIFO_FILE4 "/tmp/fifo4"
 
 const float PI = 3.14;
+const long MAX_WIDTH = 10000;
+const long MAX_HEIGHT= 10000;
+
+struct pixel_array {
+    int a[MAX_WIDTH][MAX_HEIGHT];
+};
 
 
 void gaussian_filter(char *photo_address , char *new_photo_address){
 	
 	//body of function gaussian_filter
-	
 }
 
-void gaussian_array(){
+struct pixel_array calculate_gaussin(int in_pixels[MAX_WIDTH][MAX_HEIGHT], int width, int height){
+	
+	struct pixel_array pa;
+	for(int i = 0; i < width; i++){
+		for(int j = 0; j < height; j++){
+			pa.a[i][j] = in_pixels[i][j];
+		}
+	}
 
+	return pa;
 }
 
 void calculate_histogram(char *photo_address){
@@ -33,6 +45,7 @@ void calculate_histogram(char *photo_address){
 
 	fread(header, sizeof(unsigned char), 54, fIn);
 
+	fwrite(header, sizeof(unsigned char), 54, fOut);
 
 	int width = *(int*)&header[18];
 	int height = abs(*(int*)&header[22]);
@@ -47,6 +60,7 @@ void calculate_histogram(char *photo_address){
 		{
 			fread(&pixel, 1, 1, fIn);
 			in_pixels[x][y] = pixel;
+                        calculate_gaussin(in_pixels, width, height);
 			printf("pixel=%d\n",pixel);
 			printf("in_pixel[%d][%d]=%d\n", x, y, in_pixels[x][y]);			
 
@@ -54,7 +68,6 @@ void calculate_histogram(char *photo_address){
 		}
 	}
 	
-	fwrite(header, sizeof(unsigned char), 54, fOut);
 
 	fclose(fIn);
 }
