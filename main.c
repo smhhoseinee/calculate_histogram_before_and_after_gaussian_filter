@@ -6,12 +6,15 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <string.h>
+#include "pbPlots.h"
+#include "supportLib.h"
+
 
 #define FIFO_FILE1 "/tmp/fifo1"
 #define FIFO_FILE2 "/tmp/fifo2"
 #define FIFO_FILE3 "/tmp/fifo3"
 #define FIFO_FILE4 "/tmp/fifo4"
-
+void draw_histogram(double *xs , double *ys ,char *name);
 int main(){
 
 	//Variables
@@ -113,23 +116,41 @@ int main(){
 	//Get the entrance photo histogram before applying the Gaussian filter from the process C
 	close(fd2[1]);
 	read(fd2[0] , histogram_1 , 256*sizeof(int));
-	printf("The histogram of the input photo is :\n");
-	for(int i = 0 ; i < 256 ; i++){
-		printf("%-5d ", histogram_1[i]);
-		if(i%15 == 0){
-			printf("\n");
-		}
+	
+	//draw histogram plot
+	double xs [256];
+	for(int i = 0 ; i < 355 ; i++){
+		xs[i] = i ;
 	}
+	double ys[256] ;
+	for(int i = 0 ; i < 256 ; i++){
+		ys[i] =(double) histogram_1[i];
+	}
+	char name1 [100] = "histogram_befor_Gaussian_filter.png";
+	draw_histogram(xs ,ys ,name1);
+
+
 
 	//Get the new photo histogram after applying the Gaussian filter from the process C
-	read(fd2[0] , histogram_1 , 256*sizeof(int));
-	printf("The histogram of the new photo is :\n");
-	for(int i = 0 ; i < 256 ; i++){
-		printf("%-5d ", histogram_1[i]);
-		if(i%15 == 0){
-			printf("\n");
-		}
-	}
+	read(fd2[0] , histogram_2 , 256*sizeof(int));
 
+	//draw histogram plot
+	for(int i = 0 ; i < 256 ; i++){
+		ys[i] =(double) histogram_2[i];
+	}
+	char name2 [100] = "histogram_after_Gaussian_filter.png";
+	draw_histogram(xs ,ys ,name2);
+
+	return 0;	
+}
+
+void draw_histogram(double *xs , double *ys ,char *name ){
 	
+	RGBABitmapImageReference *imageReference = CreateRGBABitmapImageReference();
+	DrawScatterPlot(imageReference ,800 ,600 ,xs ,256 ,ys ,256);
+
+	size_t length ;
+	double *pngData = ConvertToPNG(&length , imageReference -> image);
+	WriteToFile(pngData , length , name);
+
 }

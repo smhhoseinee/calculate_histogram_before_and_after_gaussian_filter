@@ -23,7 +23,7 @@ int main(){
 	fd_1 = open(FIFO_FILE1 , O_RDONLY);
 	fd_2 = open(FIFO_FILE2 , O_WRONLY);
 	
-	//Get the photo address before applying Gaussian filter from process C
+	//Get the photo address before applying Gaussiaread_bytes = read(fd_1 , photo_address , sizeof(photo_address));n filter from process C
 	read_bytes = read(fd_1 , photo_address , sizeof(photo_address));
 	photo_address[read_bytes] = '\0';
 	printf("photo address is resived from process C in process A is: %s\n" , photo_address );
