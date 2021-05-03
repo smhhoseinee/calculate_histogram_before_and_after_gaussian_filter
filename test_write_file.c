@@ -9,9 +9,10 @@
 #define FIFO_FILE3 "/tmp/fifo3"
 #define FIFO_FILE4 "/tmp/fifo4"
 
+#define MAX_WIDTH  10000
+#define MAX_HEIGHT 10000
+
 const float PI = 3.14;
-const long MAX_WIDTH = 10000;
-const long MAX_HEIGHT= 10000;
 
 struct pixel_array {
     int a[MAX_WIDTH][MAX_HEIGHT];
@@ -36,11 +37,13 @@ struct pixel_array calculate_gaussin(int in_pixels[MAX_WIDTH][MAX_HEIGHT], int w
 }
 
 void calculate_histogram(char *photo_address){
+	printf("2\n");
 	unsigned char header[54];
 	unsigned char pixel;
 	unsigned char pixel2;
 
 	FILE *fIn = fopen(photo_address, "rb");
+
 	FILE *fOut = fopen("./output.bmp", "w+b");
 
 	fread(header, sizeof(unsigned char), 54, fIn);
@@ -51,6 +54,7 @@ void calculate_histogram(char *photo_address){
 	int height = abs(*(int*)&header[22]);
 
 	int in_pixels[width][height];
+	int out_pixels[width][height];
 
 	printf("width=%d\nheight=%d\n",width,height);
 
@@ -60,11 +64,21 @@ void calculate_histogram(char *photo_address){
 		{
 			fread(&pixel, 1, 1, fIn);
 			in_pixels[x][y] = pixel;
-                        calculate_gaussin(in_pixels, width, height);
+			//printf("pixel=%d\n",pixel);
+			//printf("in_pixel[%d][%d]=%d\n", x, y, in_pixels[x][y]);			
+		}
+	}
+
+	struct pixel_array out_pixel_array = calculate_gaussin(in_pixels, width, height);
+
+	for (int y = 0; y < height; ++y)
+	{
+		for (int x = 0; x < width; ++x)
+		{
+			unsigned char charInt =  (unsigned char)out_pixel_array.a[x][y] ;
+			memset(&pixel, charInt, sizeof(pixel));
 			printf("pixel=%d\n",pixel);
-			printf("in_pixel[%d][%d]=%d\n", x, y, in_pixels[x][y]);			
-
-
+			fwrite(&pixel, 1, 1, fOut);
 		}
 	}
 	
