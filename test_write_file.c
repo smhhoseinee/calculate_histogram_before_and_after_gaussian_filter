@@ -14,8 +14,11 @@
 
 const float PI = 3.14;
 
+int in_pixels[MAX_WIDTH][MAX_HEIGHT];
+
 struct pixel_array {
-    int a[MAX_WIDTH][MAX_HEIGHT];
+//    int values[MAX_WIDTH][MAX_HEIGHT];
+    int** values;
 };
 
 
@@ -27,17 +30,67 @@ void gaussian_filter(char *photo_address , char *new_photo_address){
 struct pixel_array calculate_gaussin(int in_pixels[MAX_WIDTH][MAX_HEIGHT], int width, int height){
 	
 	struct pixel_array pa;
+	pa.values = malloc(width*sizeof(int*)); // allocates one dimension
+	for(int i = 0; i < width; i++) {
+	        pa.values[i] = malloc(height*sizeof(int)); // allocates second one dimension
+	}
+
 	for(int i = 0; i < width; i++){
 		for(int j = 0; j < height; j++){
-			pa.a[i][j] = in_pixels[i][j];
+			printf("i=%d j=%d\n",i,j);
+			pa.values[i][j] = in_pixels[i][j];
+
 		}
 	}
 
 	return pa;
 }
 
+int **calculate_gaussin2(int in_pixels[MAX_WIDTH][MAX_HEIGHT], int width, int height){
+	int **values;
+	values = (int **)malloc(width*sizeof(int*)); // allocates one dimension
+	for(int i = 0; i < width; i++) {
+	        values[i] = (int *)malloc(height*sizeof(int)); // allocates second one dimension
+	}
+
+	int x;
+	for(int i = 0; i < width; i++){
+		for(int j = 0; j < height; j++){
+			//printf("i=%d j=%d\n",i,j);
+			//values[i][j] = in_pixels[i][j];
+			printf("in_pixel[%d][%d]=%d\n", i, j, in_pixels[i][j]);			
+			x  = in_pixels[i][j];
+			printf("x=%d\n\n",x);
+			values[i][j] = x;
+
+		}
+	}
+
+	return values;
+}
+
+int calculate_gaussin3(int width, int height){
+	int temp_pixels[MAX_WIDTH][MAX_HEIGHT];
+	for(int i = 0; i < width; i++){
+		for(int j = 0; j < height; j++){
+			//printf("i=%d j=%d\n",i,j);
+			//values[i][j] = in_pixels[i][j];
+			printf("in_pixel[%d][%d]=%d\n", i, j, in_pixels[i][j]);			
+			temp_pixels[i][j] = in_pixels[i][j];
+		}
+	}
+
+
+
+
+	return 0;
+}
+
+
+
+
 void calculate_histogram(char *photo_address){
-	printf("2\n");
+	printf("2nd\n");
 	unsigned char header[54];
 	unsigned char pixel;
 	unsigned char pixel2;
@@ -47,13 +100,11 @@ void calculate_histogram(char *photo_address){
 	FILE *fOut = fopen("./output.bmp", "w+b");
 
 	fread(header, sizeof(unsigned char), 54, fIn);
-
 	fwrite(header, sizeof(unsigned char), 54, fOut);
 
 	int width = *(int*)&header[18];
 	int height = abs(*(int*)&header[22]);
 
-	int in_pixels[width][height];
 	int out_pixels[width][height];
 
 	printf("width=%d\nheight=%d\n",width,height);
@@ -69,21 +120,27 @@ void calculate_histogram(char *photo_address){
 		}
 	}
 
-	struct pixel_array out_pixel_array = calculate_gaussin(in_pixels, width, height);
+	//struct pixel_array out_pixel_array = calculate_gaussin(in_pixels, width, height);
+	//int **out_pixel_array = calculate_gaussin2(in_pixels, width, height);
+	calculate_gaussin3(width, height);
 
-	for (int y = 0; y < height; ++y)
+	for (int x = 0; x < width; ++x)
 	{
-		for (int x = 0; x < width; ++x)
+		for (int y = 0; y < height; ++y)
 		{
-			unsigned char charInt =  (unsigned char)out_pixel_array.a[x][y] ;
-			memset(&pixel, charInt, sizeof(pixel));
-			printf("pixel=%d\n",pixel);
+
+			//			unsigned char charInt =  (unsigned char)out_pixel_array.a[x][y] ;
+			//			memset(&pixel, charInt, sizeof(pixel));
+//			printf("pixel=%d\n",pixel);
+//			printf("in_pixel[%d][%d]=%d\n", x, y, out_pixels[x][y]);			
+//			printf("in_pixel[%d][%d]=%d\n", x, y, in_pixels[x][y]);			
 			fwrite(&pixel, 1, 1, fOut);
 		}
 	}
 	
 
 	fclose(fIn);
+	fclose(fOut);
 }
 
 int main(){
