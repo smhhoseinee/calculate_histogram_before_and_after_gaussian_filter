@@ -6,6 +6,13 @@
 #include <string.h>
 #include <stdlib.h>
 
+// Load image using the stb_image library, convert the image to gray and sepia, write it back to disk
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image/stb_image.h"
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image/stb_image_write.h"
+
+
 
 #define FIFO_FILE3 "/tmp/fifo3"
 #define FIFO_FILE4 "/tmp/fifo4"
@@ -47,8 +54,42 @@ int main(){
 
 void gaussian_filter(char *photo_address , char *new_photo_address){
 	
-	//body of function gaussian_filter
-	
+//	char* postfix = "_gaussin"; 
+//	new_photo_address = photo_address;
+//	strcat(new_photo_address, postfix);
+
+	new_photo_address = "./output.bmp";
+
+	char* str1;
+	char* str2;
+	char* str3;
+	str1 = "./gauss_blur/blur";
+	str2 = photo_address;
+	str3 = "temp.png";
+	char * str4 = (char *) malloc(1 + sizeof(char*) * (strlen(str1) + strlen(str2) + strlen(str3)));
+	strcpy(str4, str1);
+	strcat(str4, " ");
+	strcat(str4, str2);
+	strcat(str4, " ");
+	strcat(str4, str3);
+
+	printf("\n%s\n",str4);
+
+	// Create temp.png blured image with gaussin filter
+	system(str4);
+
+	int width, height, channels;
+	unsigned char *img = stbi_load(str3 , &width, &height, &channels, 0);
+	if(img == NULL) {
+		printf("loading %s failed :  maybe file is not available in the path or permission is denied\n",str3);
+		exit(1);
+	}
+	printf("%s[%d][%d]px successfully loaded ,channels=%d\n",str3, width, height, channels);
+
+	stbi_write_bmp(new_photo_address, width, height, channels, img);
+
+	stbi_image_free(img);
+
 }
 
 void calculate_histogram(char *photo_address ,int *histogram ){

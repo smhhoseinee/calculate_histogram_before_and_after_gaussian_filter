@@ -146,5 +146,25 @@ void calculate_histogram(char *photo_address){
 int main(){
 	printf("start\n");
 	//calculate_histogram("./input1.bmp");
-	calculate_histogram("./input2.bmp");
+	//calculate_histogram("./input2.bmp");
+
+	char* str1;
+	char* str2;
+	char* str3;
+	str1 = "./gauss_blur/blur";
+	str2 = "./sky.jpg";
+	str3 = "./sky.png";
+	char * str4 = (char *) malloc(1 + sizeof(char*) * (strlen(str1) + strlen(str2) + strlen(str3)));
+	strcpy(str4, str1);
+	strcat(str4, " ");
+	strcat(str4, str2);
+	strcat(str4, " ");
+	strcat(str4, str3);
+
+	printf("\n%s\n",str4);
+
+	//char *x = "./gauss_blur/blur "
+	//system("./gauss_blur/blur ./sky.jpg ./sky.png");
+	system(str4);
+	
 }
