@@ -28,6 +28,9 @@ int main(){
 	char new_photo_address[100];
 	int fd_1 , fd_2;
 	int read_bytes;
+
+	//char *new_photo_address;
+	//new_photo_address = (char*)malloc(100*sizeof(char));
 	
 	//Open a named pipe betweem process B and C
 	fd_1 = open(FIFO_FILE3 , O_RDONLY);
@@ -41,9 +44,10 @@ int main(){
 	//Apply Gaussian filter on input photo
 	gaussian_filter(photo_address , new_photo_address);
 	
+	printf("2nd:new_photo_address = %s\n",new_photo_address);
 	//Send new photo address after applying Gaussian filter to process C.
-//	write(fd_2 , new_photo_address , sizeof(new_photo_address));
-	write(fd_2 , photo_address , sizeof(photo_address));
+	write(fd_2 , new_photo_address , sizeof(new_photo_address));
+//	write(fd_2 , photo_address , sizeof(photo_address));
 	
 	//End process B and close named pipe
 	close(fd_1);
@@ -58,7 +62,8 @@ void gaussian_filter(char *photo_address , char *new_photo_address){
 //	new_photo_address = photo_address;
 //	strcat(new_photo_address, postfix);
 
-	new_photo_address = "./output.bmp";
+
+	strcpy(new_photo_address,"./output.bmp");
 
 	char* str1;
 	char* str2;
@@ -89,6 +94,7 @@ void gaussian_filter(char *photo_address , char *new_photo_address){
 
 	stbi_write_bmp(new_photo_address, width, height, channels, img);
 
+	printf("\nnew_photo_address = %s\n",new_photo_address);
 	stbi_image_free(img);
 
 }
