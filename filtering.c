@@ -8,9 +8,9 @@
 
 // Load image using the stb_image library, convert the image to gray and sepia, write it back to disk
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb_image/stb_image.h"
+#include "./stb/stb_image.h"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "stb_image/stb_image_write.h"
+#include "./stb/stb_image_write.h"
 
 
 
@@ -73,7 +73,8 @@ void gaussian_filter(char *photo_address , char *new_photo_address){
 	strcat(str4, " ");
 	strcat(str4, str3);
 
-	printf("\n%s\n",str4);
+
+	printf("\ncommand to execute: %s\n",str4);
 
 	// Create temp.png blured image with gaussin filter
 	system(str4);
