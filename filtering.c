@@ -68,7 +68,7 @@ void gaussian_filter(char *photo_address , char *new_photo_address){
 	char* str1;
 	char* str2;
 	char* str3;
-	str1 = "./gauss_blur/blur";
+	str1 = "./blur";
 	str2 = photo_address;
 	str3 = "temp.png";
 	char * str4 = (char *) malloc(1 + sizeof(char*) * (strlen(str1) + strlen(str2) + strlen(str3)));
